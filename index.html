@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Desafio Cognitivo — V2</title>
+<style>
+:root{--blue:#0b70f2;--navy:#071b49;--teal:#0e827b;--bg:#fff;--muted:#6b7280;--card:#f6f8fb;--line:#e5eaf2}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--navy);background:#fff}
+.header{height:64px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px}
+.header span{color:var(--blue)}
+.wrap{max-width:1000px;margin:0 auto;padding:34px 20px 70px}.center{text-align:center}.hidden{display:none!important}
+h1{font-size:38px;line-height:1.12;margin:10px auto 14px;max-width:780px}.lead{font-size:18px;line-height:1.55;color:#4b5563;max-width:680px;margin:0 auto 28px}
+.btn{border:0;border-radius:14px;background:var(--teal);color:white;font-size:17px;font-weight:800;padding:15px 34px;cursor:pointer;min-width:220px}.btn.blue{background:var(--blue)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.progress{height:6px;background:#edf1f7;border-radius:99px;overflow:hidden;margin:0 0 30px}.progress>i{display:block;height:100%;background:var(--blue);width:0;transition:.35s}
+.meta{display:flex;justify-content:space-between;color:#6b7280;font-size:14px;margin-bottom:9px}.question{max-width:850px;margin:0 auto}.qtitle{font-size:28px;font-weight:800;text-align:center;margin:18px 0 25px}.options{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:700px;margin:auto}.opt{background:#f7f9fc;border:2px solid transparent;border-radius:15px;padding:18px 20px;text-align:left;font-size:17px;color:var(--navy);cursor:pointer;transition:.15s}.opt:hover{border-color:#b8d5ff;background:#f3f8ff}.opt.selected{border-color:var(--blue);background:#eaf3ff}.next{text-align:center;margin-top:24px}
+.card{background:#f7f9fc;border:1px solid var(--line);border-radius:22px;padding:30px;max-width:760px;margin:35px auto;text-align:center}.icon{font-size:58px;margin-bottom:12px}.small{color:#6b7280;line-height:1.5}.metric{font-size:54px;font-weight:900;color:var(--blue)}
+.memoryBox{font-size:42px;font-weight:900;letter-spacing:12px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:30px;margin:20px auto;max-width:600px}.timer{font-size:38px;font-weight:900;color:var(--blue)}.visual-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:420px;margin:20px auto}.tile{height:80px;border:2px solid #111;border-radius:8px;position:relative;background:#fff}.tile::before,.tile::after{content:"";position:absolute;background:#111;left:50%;top:50%;transform:translate(-50%,-50%)}.tile::before{width:52px;height:5px}.tile::after{width:5px;height:52px}.tile.diag::before{transform:translate(-50%,-50%) rotate(45deg)}.tile.diag::after{transform:translate(-50%,-50%) rotate(45deg)}.tile.dot::after{width:15px;height:15px;border-radius:50%}.tile.dot::before{display:none}.tile.blank{border-color:var(--blue);border-width:3px}.tile.blank:after{content:"?";background:none;color:var(--blue);font-size:40px;font-weight:900;width:auto;height:auto}
+.checkpoint h2{font-size:30px;margin:0 0 10px}.checkpoint p{font-size:18px;line-height:1.55;color:#4b5563}
+.email{max-width:500px;margin:22px auto}.email input{width:100%;padding:16px 18px;border:1px solid #cfd7e4;border-radius:13px;font-size:16px}.consent{font-size:12px;color:#6b7280;text-align:left;margin:12px 0}.consent label{display:flex;gap:9px;align-items:flex-start}.consent input{margin-top:2px}
+.locked{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;max-width:1000px;margin:auto}.scorebox{background:#f7f9fc;border:1px solid var(--line);border-radius:22px;padding:32px;text-align:center}.blur{filter:blur(10px);user-select:none}.bars{text-align:left}.barrow{margin:16px 0}.barrow b{display:flex;justify-content:space-between}.bar{height:9px;background:#e8edf5;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--blue)}
+.price{font-size:44px;font-weight:900}.strike{text-decoration:line-through;color:#9ca3af}.offer{border:1px solid #dce5f3;border-radius:22px;padding:30px;background:#fff;box-shadow:0 15px 45px rgba(8,31,73,.08)}.offer li{margin:10px 0}.tag{display:inline-block;background:#e9f2ff;color:var(--blue);padding:7px 11px;border-radius:999px;font-size:12px;font-weight:800}
+.pay{max-width:600px;margin:auto}.pay input{width:100%;padding:14px;margin:7px 0;border:1px solid #ccd5e3;border-radius:12px}.success{font-size:22px;font-weight:800;color:var(--teal)}
+@media(max-width:720px){h1{font-size:30px}.options{grid-template-columns:1fr}.locked{grid-template-columns:1fr}.memoryBox{font-size:32px;letter-spacing:7px}.wrap{padding-top:24px}.metric{font-size:44px}}
+
+.visualQuestion{display:flex;flex-direction:column;align-items:center;margin:4px auto 18px}
+.matrixPanel{display:grid;grid-template-columns:repeat(3,86px);gap:6px;margin:0 auto 12px}
+.matrixCell{width:86px;height:70px;border:2px solid #222;border-radius:7px;background:#fff;display:flex;align-items:center;justify-content:center}
+.qmark{font-size:38px;color:#0b70f2;font-weight:900}
+.optSvg{width:88px;height:60px;display:block;margin:2px auto}
+.visualOpt{position:relative;min-height:100px;padding:10px 14px!important;text-align:center!important}
+.visualOpt .letter{position:absolute;left:12px;top:8px;font-size:12px;color:#718096;font-weight:800}
+.visualHint{font-size:14px;color:#6b7280}
+.compareCards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+.compareCard{border:1px solid #e0e6ef;border-radius:14px;padding:12px;background:#fff}
+.compareCard.you{border:2px solid #0b70f2;background:#eef6ff}
+.silhouette{height:65px;display:flex;align-items:center;justify-content:center;font-size:42px;margin-bottom:5px}
+.compareCard small{display:block;color:#7b8493;font-size:11px;margin-top:4px}
+@media(max-width:720px){.matrixPanel{grid-template-columns:repeat(3,70px)}.matrixCell{width:70px;height:60px}.optSvg{width:74px}.compareCards{grid-template-columns:1fr 1fr}.compareCard:last-child{grid-column:1/-1}}
+
+.scientistArt{height:62px;width:62px;display:flex;align-items:center;justify-content:center;margin:0 auto 5px}
+.scientistArt svg{width:62px;height:62px}
+.compareCard small{line-height:1.25}
+</style>
+</head>
+<body>
+<header class="header">🧠 <span>Desafio Cognitivo</span></header>
+<main class="wrap">
+
+<section id="start" class="center">
+  <div class="tag">VERSÃO V2.7 • CHECKOUT INTEGRADO</div>
+  <h1>Descubra como você se sai em desafios de memória, lógica, atenção e percepção.</h1>
+  <p class="lead">Um teste interativo com dificuldade progressiva e diferentes tipos de desafios. Leva aproximadamente 7 minutos.</p>
+  <div class="card">
+    <div class="icon">⚡</div><h2>41 desafios</h2>
+    <p class="small">Memória de trabalho • Raciocínio lógico • Números • Percepção visual • Atenção</p>
+  </div>
+  <button class="btn blue" onclick="startQuiz()">Começar o teste</button>
+  <p class="small" style="margin-top:18px">Experiência recreativa/educacional. Não é diagnóstico psicológico.</p>
+</section>
+
+<section id="quiz" class="hidden">
+  <div class="meta"><span id="qnum">Pergunta 1 de 40</span><span id="cat">Memória</span></div>
+  <div class="progress"><i id="prog"></i></div>
+  <div id="questionArea"></div>
+</section>
+
+<section id="checkpoint" class="hidden center">
+  <div class="card checkpoint">
+    <div class="icon" id="cpIcon">⚡</div>
+    <h2 id="cpTitle"></h2><p id="cpText"></p>
+    <div id="cpMetric"></div>
+    <button class="btn" id="cpContinue" type="button">Continuar</button>
+  </div>
+</section>
+
+<section id="analyzing" class="hidden center">
+  <div class="card">
+    <div class="icon">🧠</div><h2>Seu teste foi concluído</h2>
+    <p class="lead" style="font-size:17px">Estamos organizando suas respostas e preparando sua análise.</p>
+    <div id="analysisSteps" style="text-align:left;max-width:480px;margin:auto"></div>
+  </div>
+</section>
+
+<section id="email" class="hidden center">
+  <div class="card">
+    <div class="icon">🎉</div>
+    <h1 style="font-size:32px">Seu resultado está pronto!</h1>
+    <p class="lead" style="font-size:17px">Digite seu melhor e-mail para salvar o resultado e continuar.</p>
+    <div class="email">
+      <input id="emailInput" type="email" placeholder="seuemail@exemplo.com">
+      <div class="consent"><label><input id="marketing" type="checkbox"> Quero receber novidades, ofertas e novos desafios por e-mail.</label></div>
+      <button class="btn" onclick="submitEmail()">Continuar</button>
+    </div>
+    <p class="small">Ao continuar, você concorda com os termos e a política de privacidade do produto.</p>
+  </div>
+</section>
+
+<section id="offer" class="hidden">
+  <div class="center"><div class="tag">RESULTADO CALCULADO</div><h1>Parabéns! Sua análise está pronta.</h1><p class="lead">Sua pontuação foi calculada com base nas respostas do teste.</p></div>
+  <div class="locked">
+    <div class="scorebox">
+      <p class="small">SUA PONTUAÇÃO</p><div class="metric blur" id="lockedScore">118</div>
+      <div class="compareCards">
+        <div class="compareCard">
+          <div class="scientistArt" aria-hidden="true">
+            <svg viewBox="0 0 90 90" role="img">
+              <circle cx="45" cy="30" r="19" fill="#f1c7a5"/>
+              <path d="M25 29c2-18 39-23 42 1-5-7-11-9-19-8-8 0-15 4-23 7z" fill="#d9d9d9"/>
+              <path d="M27 31c4 4 8 5 12 5M63 31c-4 4-8 5-12 5" stroke="#555" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <circle cx="38" cy="30" r="2.3" fill="#222"/><circle cx="52" cy="30" r="2.3" fill="#222"/>
+              <path d="M39 40c4 4 8 4 12 0" stroke="#555" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M30 52c8-6 22-6 30 0l7 30H23z" fill="#25324a"/>
+              <path d="M37 52l8 12 8-12" fill="#fff"/>
+            </svg>
+          </div>
+          <b>Referência</b><small>Cientista clássico — ilustração</small>
+        </div>
+        <div class="compareCard you">
+          <div class="silhouette">?</div>
+          <b>VOCÊ</b><small>Desbloqueie para descobrir</small>
+        </div>
+        <div class="compareCard">
+          <div class="scientistArt" aria-hidden="true">
+            <svg viewBox="0 0 90 90" role="img">
+              <circle cx="45" cy="30" r="19" fill="#f1c7a5"/>
+              <path d="M25 27c5-17 34-19 40 0-8-5-12-7-20-7-8 0-13 3-20 7z" fill="#b8b8b8"/>
+              <rect x="31" y="27" width="12" height="8" rx="3" fill="none" stroke="#555" stroke-width="2"/>
+              <rect x="47" y="27" width="12" height="8" rx="3" fill="none" stroke="#555" stroke-width="2"/>
+              <path d="M43 31h4" stroke="#555" stroke-width="2"/>
+              <path d="M30 52c8-6 22-6 30 0l7 30H23z" fill="#315f91"/>
+              <path d="M45 53v29M32 63h26" stroke="#fff" stroke-width="2" opacity=".8"/>
+            </svg>
+          </div>
+          <b>Referência</b><small>Perfil científico — ilustração</small>
+        </div>
+      </div>
+      <p class="small">As imagens são apenas referências visuais. O teste não atribui pontuações de QI a pessoas famosas nem compara seu resultado com o de uma pessoa real.</p>
+      <div class="bars blur">
+        <div class="barrow"><b><span>Memória</span><span>87%</span></b><div class="bar"><i style="width:87%"></i></div></div>
+        <div class="barrow"><b><span>Lógica</span><span>79%</span></b><div class="bar"><i style="width:79%"></i></div></div>
+        <div class="barrow"><b><span>Visual</span><span>91%</span></b><div class="bar"><i style="width:91%"></i></div></div>
+      </div>
+    </div>
+    <div class="offer">
+      <span class="tag">COMPRA ÚNICA</span>
+      <h2>Desbloqueie seu resultado completo</h2>
+      <ul>
+        <li>✓ Pontuação final do teste</li><li>✓ Percentil de desempenho</li><li>✓ Análise por categoria</li><li>✓ Relatório detalhado</li><li>✓ Certificado digital</li>
+      </ul>
+      <p><span class="strike">R$ 29,90</span></p><div class="price">R$ 9,90</div>
+      <p class="small">Pagamento único. Sem assinatura.</p>
+      <button class="btn blue" onclick="openCheckout()">Desbloquear meu resultado — R$ 9,90</button>
+    </div>
+  </div>
+</section>
+
+<section id="payment" class="hidden center">
+  <div class="pay">
+    <div class="tag">CHECKOUT LASTLINK</div><h1 style="font-size:32px">Desbloquear resultado</h1>
+    <p class="lead" style="font-size:16px">Você será direcionado ao checkout seguro da Lastlink para concluir o pagamento de R$ 9,90.</p>
+    <p class="small">Se esta tela aparecer, use o botão abaixo para abrir o checkout oficial.</p>
+    <button class="btn blue" onclick="openCheckout()">Ir para pagamento — R$ 9,90</button>
+  </div>
+</section>
+
+<section id="result" class="hidden">
+  <div class="center"><div class="tag">RESULTADO DESBLOQUEADO</div><h1>Seu resultado</h1><div class="metric" id="finalScore">118</div><p class="lead">Estimativa de desempenho deste teste — não é uma avaliação psicológica clínica.</p></div>
+  <div class="card"><h2>Seu desempenho por categoria</h2><div class="bars">
+    <div class="barrow"><b><span>Memória de trabalho</span><span id="memPct">87%</span></b><div class="bar"><i id="memBar"></i></div></div>
+    <div class="barrow"><b><span>Raciocínio lógico</span><span id="logPct">79%</span></b><div class="bar"><i id="logBar"></i></div></div>
+    <div class="barrow"><b><span>Raciocínio numérico</span><span id="numPct">72%</span></b><div class="bar"><i id="numBar"></i></div></div>
+    <div class="barrow"><b><span>Percepção visual</span><span id="visPct">91%</span></b><div class="bar"><i id="visBar"></i></div></div>
+    <div class="barrow"><b><span>Atenção</span><span id="attPct">84%</span></b><div class="bar"><i id="attBar"></i></div></div>
+  </div></div>
+  <div class="card"><h2>O que este resultado significa?</h2><p class="small">O resultado representa seu desempenho dentro das regras e desafios desta experiência. Para uma avaliação psicológica ou psicométrica formal, procure um profissional habilitado.</p></div>
+</section>
+</main>
+
+<script>
+const qs = [
+{cat:'Memória',type:'memory',seq:'7 3 8 5 2',ask:'Qual era o 4º número?',opts:['3','5','8','2'],ans:1},
+{cat:'Memória',type:'memory',seq:'4 9 1 6 3 8',ask:'Qual era o 2º número?',opts:['4','9','6','8'],ans:1},
+{cat:'Lógica',type:'mc',q:'Qual número completa a sequência? 2, 4, 8, 16, ?',opts:['20','24','30','32'],ans:3},
+{cat:'Numérico',type:'mc',q:'Qual número completa? 3, 6, 9, 12, ?',opts:['14','15','16','18'],ans:1},
+{cat:'Atenção',type:'mc',q:'Qual símbolo é diferente?  ▲ ▲ ▲ △ ▲',opts:['1º','2º','4º','5º'],ans:2},
+{cat:'Visual',type:'matrix',variant:1,q:'Qual figura completa a sequência?',opts:['A','B','C','D'],ans:0},
+{cat:'Lógica',type:'mc',q:'Em uma turma, todo aluno que participa do Clube A também participa do Clube B. João participa do Clube A. O que podemos afirmar com certeza?',opts:['João participa do Clube B','João participa apenas do Clube A','João não participa do Clube B','Não é possível saber'],ans:0},
+{cat:'Numérico',type:'mc',q:'Qual é o próximo número? 1, 4, 9, 16, ?',opts:['20','24','25','36'],ans:2},
+{cat:'Memória',type:'memory',seq:'8 2 5 1 7 4 9',ask:'Qual era o 6º número?',opts:['1','4','7','9'],ans:1},
+{cat:'Atenção',type:'mc',q:'Quantas vezes aparece a letra A? CASA AMARELA',opts:['4','5','6','7'],ans:2},
+{cat:'Lógica',type:'mc',q:'Um relógio adianta 5 minutos por hora. Em 4 horas, quanto terá adiantado?',opts:['10 min','15 min','20 min','25 min'],ans:2},
+{cat:'Visual',type:'matrix',variant:2,q:'Qual figura deve ocupar o espaço vazio?',opts:['A','B','C','D'],ans:2},
+{cat:'Numérico',type:'mc',q:'7 × 8 − 10 = ?',opts:['42','46','48','54'],ans:1},
+{cat:'Memória',type:'memory',seq:'6 1 9 3 8 2 5',ask:'Qual era o 3º número?',opts:['6','9','3','8'],ans:1},
+{cat:'Atenção',type:'mc',q:'Qual palavra aparece duas vezes? LAGO — RIO — MAR — LAGO — CÉU',opts:['RIO','MAR','LAGO','CÉU'],ans:2},
+{cat:'Lógica',type:'mc',q:'Se A > B e B > C, então:',opts:['C > A','A > C','A = C','B < C'],ans:1},
+{cat:'Numérico',type:'mc',q:'Qual número falta? 5, 10, 20, 40, ?',opts:['50','60','70','80'],ans:3},
+{cat:'Visual',type:'matrix',variant:3,q:'Qual imagem continua o movimento?',opts:['A','B','C','D'],ans:1},
+{cat:'Lógica',type:'mc',q:'Ana é mais velha que Bia. Bia é mais velha que Caio. Quem é o mais novo?',opts:['Ana','Bia','Caio','Não é possível'],ans:2},
+{cat:'Memória',type:'memory',seq:'2 8 4 9 1 6 3',ask:'Qual era o 5º número?',opts:['4','9','1','6'],ans:2},
+{cat:'Atenção',type:'mc',q:'Qual número está repetido? 4 8 2 6 9 3 8 1',opts:['4','8','6','9'],ans:1},
+{cat:'Numérico',type:'mc',q:'18 ÷ 3 + 7 = ?',opts:['10','11','12','13'],ans:1},
+{cat:'Lógica',type:'mc',q:'Se hoje é terça-feira, que dia será daqui a 10 dias?',opts:['quinta','sexta','sábado','domingo'],ans:1},
+{cat:'Visual',type:'matrix',variant:4,q:'Qual figura é o espelho da imagem?',opts:['A','B','C','D'],ans:3},
+{cat:'Memória',type:'memory',seq:'9 5 2 8 6 1 4',ask:'Qual era o 7º número?',opts:['2','8','4','1'],ans:2},
+{cat:'Numérico',type:'mc',q:'Qual é o próximo? 81, 27, 9, 3, ?',opts:['0','1','2','6'],ans:1},
+{cat:'Atenção',type:'mc',q:'Qual item é diferente dos demais por não ser uma fruta?',opts:['Maçã','Pêra','Banana','Cenoura'],ans:3},
+{cat:'Lógica',type:'mc',q:'Três caixas têm rótulos errados. Qual ação garante identificar todas?',opts:['Abrir uma caixa','Abrir duas caixas','Retirar um item da caixa rotulada “mistura”','Não é possível'],ans:2},
+{cat:'Visual',type:'matrix',variant:5,q:'Qual peça completa a sequência de posições?',opts:['A','B','C','D'],ans:2},
+{cat:'Memória',type:'memory',seq:'3 7 1 8 4 9 2',ask:'Qual era o 1º número?',opts:['3','7','8','2'],ans:0},
+{cat:'Numérico',type:'mc',q:'Qual número falta? 2, 6, 12, 20, 30, ?',opts:['36','40','42','44'],ans:2},
+{cat:'Lógica',type:'mc',q:'Se 4 máquinas fazem 4 peças em 4 minutos, quantas máquinas fazem 100 peças em 100 minutos?',opts:['4','10','25','100'],ans:0},
+{cat:'Atenção',type:'mc',q:'Qual sequência é idêntica à original? 739184',opts:['739184','739814','793184','739148'],ans:0},
+{cat:'Visual',type:'matrix',variant:6,q:'Qual símbolo completa a progressão?',opts:['A','B','C','D'],ans:1},
+{cat:'Lógica',type:'mc',q:'Um objeto gira 90° para a direita a cada passo. Após 4 passos, ele está:',opts:['90°','180°','270°','na posição inicial'],ans:3},
+{cat:'Numérico',type:'mc',q:'Qual é o próximo? 2, 3, 5, 8, 13, ?',opts:['18','20','21','24'],ans:2},
+{cat:'Memória',type:'memory',seq:'5 1 8 3 9 2 7',ask:'Qual era o 6º número?',opts:['3','9','2','7'],ans:2},
+{cat:'Visual',type:'matrix',variant:7,q:'Qual opção segue a mesma regra visual?',opts:['A','B','C','D'],ans:3},
+{cat:'Atenção',type:'mc',q:'Quantos números pares existem? 3 8 5 2 7 6 1 9',opts:['2','3','4','5'],ans:2},
+{cat:'Lógica',type:'mc',q:'Se alguns X são Y e nenhum Y é Z, o que é possível?',opts:['Todo X é Z','Algum X é Z','Nenhum X é Y','Algum X não é Z'],ans:3},
+{cat:'Visual',type:'matrix',variant:8,q:'Qual figura completa a sequência?',opts:['A','B','C','D'],ans:0},];
+
+let idx=0, score=0, selected=null, timer=null, memoryPhase=false, checkpointPending=null;
+let catScore={Memória:0,Lógica:0,Numérico:0,Atenção:0,Visual:0};
+let catTotal={Memória:0,Lógica:0,Numérico:0,Atenção:0,Visual:0};
+qs.forEach(q=>catTotal[q.cat]++);
+
+function show(id){document.querySelectorAll('main>section').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
+function startQuiz(){idx=0;score=0;catScore={Memória:0,Lógica:0,Numérico:0,Atenção:0,Visual:0};show('quiz');render()}
+function render(){
+  selected=null; const q=qs[idx]; document.getElementById('qnum').textContent=`Pergunta ${idx+1} de ${qs.length}`;document.getElementById('cat').textContent=q.cat;document.getElementById('prog').style.width=((idx)/qs.length*100)+'%';
+  const a=document.getElementById('questionArea');
+  if(q.type==='memory'){renderMemory(a,q);return}
+  let html=`<div class="question"><div class="qtitle">${q.q}</div>`;
+  if(q.type==='matrix') html+=matrixVisual(q);
+  html+=`<div class="options">${q.opts.map((o,i)=>`<button type="button" class="opt visualOpt" onclick="choose(${i})">${q.type==='matrix'?optionVisual(q.variant,i):`<span class="letter">${o}</span>`}</button>`).join('')}</div><div class="next"><button type="button" class="btn" id="nextBtn" disabled onclick="answer()">Responder</button></div></div>`;
+  a.innerHTML=html;
+}
+function renderMemory(a,q){
+  memoryPhase=true;let sec=5;
+  a.innerHTML=`<div class="question center"><div class="qtitle">Memorize a sequência</div><div class="memoryBox">${q.seq}</div><div class="timer" id="timer">${sec}</div><p class="small">A sequência desaparecerá quando o contador chegar a zero.</p></div>`;
+  timer=setInterval(()=>{sec--;document.getElementById('timer').textContent=sec;if(sec<=0){clearInterval(timer);memoryPhase=false;showMemoryQuestion(a,q)}},1000)
+}
+function showMemoryQuestion(a,q){a.innerHTML=`<div class="question"><div class="qtitle">${q.ask}</div><div class="options">${q.opts.map((o,i)=>`<button type="button" class="opt" onclick="choose(${i})">${o}</button>`).join('')}</div><div class="next"><button type="button" class="btn" id="nextBtn" disabled onclick="answer()">Responder</button></div></div>`}
+function svg(content, cls=''){return `<svg class="optSvg ${cls}" viewBox="0 0 120 80" aria-hidden="true">${content}</svg>`}
+function line(x1,y1,x2,y2,w=5){return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111" stroke-width="${w}" stroke-linecap="round"/>`}
+function shape(kind, x=60,y=40,rot=0){
+  if(kind==='plus') return `<g transform="rotate(${rot} ${x} ${y})">${line(x-23,y,x+23,y,5)}${line(x,y-23,x,y+23,5)}</g>`;
+  if(kind==='x') return `<g transform="rotate(45 ${x} ${y})">${line(x-23,y,x+23,y,5)}${line(x,y-23,x,y+23,5)}</g>`;
+  if(kind==='dot') return `<circle cx="${x}" cy="${y}" r="9" fill="#111"/>`;
+  if(kind==='triangle') return `<polygon points="${x},${y-25} ${x-25},${y+20} ${x+25},${y+20}" fill="none" stroke="#111" stroke-width="5"/>`;
+  if(kind==='circle') return `<circle cx="${x}" cy="${y}" r="24" fill="none" stroke="#111" stroke-width="5"/>`;
+  if(kind==='square') return `<rect x="${x-22}" y="${y-22}" width="44" height="44" fill="none" stroke="#111" stroke-width="5"/>`;
+  if(kind==='arrow') return `<g transform="rotate(${rot} ${x} ${y})">${line(x-22,y,x+16,y,5)}<polyline points="${x+3},${y-14} ${x+18},${y} ${x+3},${y+14}" fill="none" stroke="#111" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+  return '';
+}
+
+function svgWrap(inner,w=300,h=180){
+  return `<svg class="puzzleSvg" viewBox="0 0 ${w} ${h}" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
+function rect(x,y,w,h,fill='none',stroke='#111',sw=3,rx=8){
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+}
+function circle(x,y,r=18,fill='none',stroke='#111',sw=3){
+  return `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+}
+function polygon(points,fill='none',stroke='#111',sw=3){
+  return `<polygon points="${points}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+}
+function line2(x1,y1,x2,y2,sw=4){
+  return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#111" stroke-width="${sw}" stroke-linecap="round"/>`;
+}
+function diamond(x,y,s=22){
+  return polygon(`${x},${y-s} ${x+s},${y} ${x},${y+s} ${x-s},${y}`);
+}
+function visualPanel(v){
+  let s='';
+  if(v===1){
+    // Alternating shapes in a 3x3 sequence; last cell is missing.
+    const cells=['circle','square','circle','square','circle','square','circle','square','?'];
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++){
+      const x=45+c*75,y=30+r*50;
+      s+=rect(x-27,y-18,54,36,'#fff','#222',2,7);
+      const k=cells[r*3+c];
+      if(k==='circle')s+=circle(x,y,12);
+      if(k==='square')s+=rect(x-12,y-12,24,24,'#fff','#111',3,2);
+      if(k==='?')s+=`<text x="${x}" y="${y+10}" text-anchor="middle" font-size="28" font-weight="700" fill="#1473e6">?</text>`;
+    }
+    return svgWrap(s,270,160);
+  }
+  if(v===2){
+    // 2x2 analogy: top-left has one dot, top-right two; bottom-left two; missing must be three.
+    const boxes=[[45,30],[155,30],[45,110],[155,110]];
+    boxes.forEach(([x,y])=>s+=rect(x,y,80,55,'#fff','#222',2,7));
+    s+=circle(85,57,6,'#111','#111',1);
+    s+=circle(175,48,6,'#111','#111',1)+circle(175,67,6,'#111','#111',1);
+    s+=circle(85,128,6,'#111','#111',1)+circle(72,145,6,'#111','#111',1);
+    s+=`<text x="195" y="147" text-anchor="middle" font-size="28" font-weight="700" fill="#1473e6">?</text>`;
+    return svgWrap(s,270,185);
+  }
+  if(v===3){
+    // Arrow rotates 90° clockwise through four positions.
+    const dirs=[0,90,180,270,0,90,180,270];
+    const positions=[[45,35],[115,35],[185,35],[45,100],[115,100],[185,100],[45,165],[115,165]];
+    positions.forEach(([x,y],i)=>{
+      s+=rect(x-25,y-20,50,40,'#fff','#222',2,7);
+      if(i===8){s+=`<text x="185" y="175" text-anchor="middle" font-size="28" font-weight="700" fill="#1473e6">?</text>`;return}
+      const a=dirs[i]*Math.PI/180, cx=x,cy=y;
+      const x2=cx+15*Math.cos(a),y2=cy+15*Math.sin(a);
+      s+=line2(cx-12*Math.cos(a),cy-12*Math.sin(a),x2,y2,4);
+      s+=`<polygon points="${x2},${y2} ${x2-9*Math.cos(a-0.6)},${y2-9*Math.sin(a-0.6)} ${x2-9*Math.cos(a+0.6)},${y2-9*Math.sin(a+0.6)}" fill="#111"/>`;
+    });
+    return svgWrap(s,270,220);
+  }
+  if(v===4){
+    // Mirror-image puzzle: a small L/arrow shape with the missing option to the right.
+    s+=rect(20,35,100,100,'#fff','#222',2,8);
+    s+=line2(50,110,50,65,5)+line2(50,110,90,110,5);
+    s+=`<circle cx="80" cy="75" r="7" fill="#111"/>`;
+    s+=`<text x="145" y="93" text-anchor="middle" font-size="28" font-weight="700" fill="#1473e6">→</text>`;
+    s+=rect(175,35,100,100,'#fff','#222',2,8);
+    s+=`<text x="225" y="100" text-anchor="middle" font-size="30" font-weight="700" fill="#1473e6">?</text>`;
+    return svgWrap(s,300,170);
+  }
+  if(v===5){
+    // A dot moves around the four corners clockwise; ninth position is missing.
+    const pts=[[35,25],[95,25],[155,25],[35,85],[95,85],[155,85],[35,145],[95,145],[155,145]];
+    pts.forEach(([x,y],i)=>{
+      s+=rect(x-23,y-23,46,46,'#fff','#222',2,6);
+      if(i===8)s+=`<text x="${x}" y="${y+10}" text-anchor="middle" font-size="27" font-weight="700" fill="#1473e6">?</text>`;
+      else{
+        const corners=[[x-12,y-12],[x+12,y-12],[x+12,y+12],[x-12,y+12]];
+        const [cx,cy]=corners[i%4];
+        s+=circle(cx,cy,7,'#111','#111',1);
+      }
+    });
+    return svgWrap(s,190,180);
+  }
+  if(v===6){
+    // Number of bars increases 1,2,3 / 2,3,4 / 3,4,? -> missing has 5 bars.
+    const counts=[1,2,3,2,3,4,3,4,5];
+    for(let r=0;r<3;r++)for(let c=0;c<3;c++){
+      const x=45+c*75,y=30+r*55;
+      s+=rect(x-28,y-20,56,40,'#fff','#222',2,6);
+      const n=counts[r*3+c];
+      if(r===2&&c===2)s+=`<text x="${x}" y="${y+9}" text-anchor="middle" font-size="27" font-weight="700" fill="#1473e6">?</text>`;
+      else for(let k=0;k<n;k++) s+=rect(x-16+k*8,y-10,5,20,'#111','#111',1,1);
+    }
+    return svgWrap(s,270,180);
+  }
+  if(v===7){
+    // Spatial path: a filled circle moves one step clockwise around a 3x3 perimeter.
+    const cells=[[45,30],[105,30],[165,30],[45,90],[105,90],[165,90],[45,150],[105,150],[165,150]];
+    const order=[0,1,2,5,8,7,6,3,4];
+    cells.forEach(([x,y],i)=>{
+      s+=rect(x-23,y-23,46,46,'#fff','#222',2,6);
+      if(i===8)s+=`<text x="${x}" y="${y+10}" text-anchor="middle" font-size="27" font-weight="700" fill="#1473e6">?</text>`;
+      else{
+        const pos=order[i];
+        const [px,py]=cells[pos];
+        // encode the position locally as one of four corners/center.
+        const loc=i%4;
+        const off=[[ -11,-11],[11,-11],[11,11],[-11,11]][loc];
+        s+=circle(x+off[0],y+off[1],7,'#111','#111',1);
+      }
+    });
+    return svgWrap(s,210,190);
+  }
+  // v===8: sequência clara de orientação: vertical, horizontal, vertical, horizontal -> vertical.
+  const xs=[15,90,165,240];
+  xs.forEach((x,i)=>{
+    s+=rect(x,45,60,70,'#fff','#222',2,8);
+    s+=circle(x+30,80,18);
+    if(i%2===0) s+=line2(x+30,62,x+30,98,3);
+    else s+=line2(x+12,80,x+48,80,3);
+  });
+  s+=`<text x="150" y="145" text-anchor="middle" font-size="14" fill="#555">A linha alterna entre vertical e horizontal.</text>`;
+  return svgWrap(s,315,170);
+}
+function optionVisual(v,i){
+  let s='';
+  if(v===1){
+    const kinds=['circle','square','triangle','diamond'];
+    const k=kinds[i];
+    if(k==='circle')s=circle(60,40,18);
+    if(k==='square')s=rect(42,22,36,36,'#fff','#111',3,3);
+    if(k==='triangle')s=polygon('60,20 40,58 80,58');
+    if(k==='diamond')s=diamond(60,40,20);
+  } else if(v===2){
+    // counts 1,2,3,4
+    const n=[1,2,3,4][i];
+    for(let k=0;k<n;k++)s+=circle(42+k*14,40,5,'#111','#111',1);
+  } else if(v===3){
+    const dirs=[0,90,180,270][i],a=dirs*Math.PI/180,x=60,y=40;
+    const x2=x+20*Math.cos(a),y2=y+20*Math.sin(a);
+    s+=line2(x-16*Math.cos(a),y-16*Math.sin(a),x2,y2,5);
+    s+=`<polygon points="${x2},${y2} ${x2-10*Math.cos(a-.6)},${y2-10*Math.sin(a-.6)} ${x2-10*Math.cos(a+.6)},${y2-10*Math.sin(a+.6)}" fill="#111"/>`;
+  } else if(v===4){
+    // mirror alternatives
+    const mode=[0,1,2,3][i];
+    s+=line2(45,55,45,25,5);
+    s+=line2(45,55,mode===1||mode===3?75:65,55,5);
+    if(mode===0||mode===2)s+=circle(65,30,6,'#111','#111',1);
+    else s+=circle(45,30,6,'#111','#111',1);
+    if(mode===2)s+=line2(45,25,75,25,4);
+  } else if(v===5){
+    const corners=[[48,30],[72,30],[72,50],[48,50]];
+    const [x,y]=corners[i];
+    s+=rect(35,17,50,46,'#fff','#222',2,6)+circle(x,y,7,'#111','#111',1);
+  } else if(v===6){
+    const n=[4,5,6,7][i];
+    for(let k=0;k<n;k++)s+=rect(30+k*8,25,5,30,'#111','#111',1,1);
+  } else if(v===7){
+    const pos=[[43,28],[77,28],[77,52],[43,52]][i];
+    s+=rect(35,20,50,40,'#fff','#222',2,6)+circle(pos[0],pos[1],7,'#111','#111',1);
+  } else {
+    // v8: alternativas com orientações diferentes; correta = vertical.
+    const mode=[0,1,2,3][i]; // vertical, horizontal, diagonal, sem linha
+    s+=circle(60,40,18);
+    if(mode===0) s+=line2(60,22,60,58,3);
+    if(mode===1) s+=line2(44,40,76,40,3);
+    if(mode===2) s+=line2(47,53,73,27,3);
+  }
+  return svgWrap(s,120,80);
+}
+function matrixVisual(q){
+  return `<div class="visualQuestion">${visualPanel(q.variant)}<div class="visualHint">Observe o padrão e escolha a imagem que o completa.</div></div>`;
+}
+function choose(i){selected=i;document.querySelectorAll('.opt').forEach((b,n)=>b.classList.toggle('selected',n===i));document.getElementById('nextBtn').disabled=false}
+function answer(){if(selected===null)return;const q=qs[idx];if(selected===q.ans){score++;catScore[q.cat]++}idx++;if(idx>=qs.length){finish()}else if([5,9,19,29,34].includes(idx)){checkpointPending=idx;showCheckpoint()}else{render()}}
+function showCheckpoint(){
+  const data={
+    5:['⚡','Você já começou bem!','Os próximos desafios vão exigir um pouco mais de atenção.','5 de 41 concluídas'],
+    9:['🧠','Memória em ação','Agora você já passou por diferentes tipos de desafio. Continue até o fim.','10 de 41 concluídas'],
+    19:['🔥','Metade do teste está chegando!','Seu desempenho está sendo analisado em diferentes habilidades.','20 de 41 concluídas'],
+    29:['🎯','A dificuldade aumentou','As próximas questões exigem mais atenção aos detalhes.','30 de 41 concluídas'],
+    34:['🚀','Estás quase!','Faltam só 5 perguntas para concluir sua análise.','88% concluído']
+  };
+  const d=data[checkpointPending]||data[34];document.getElementById('cpIcon').textContent=d[0];document.getElementById('cpTitle').textContent=d[1];document.getElementById('cpText').textContent=d[2];document.getElementById('cpMetric').innerHTML=`<div class="metric" style="font-size:38px">${d[3]}</div>`;show('checkpoint')
+}
+function continueCheckpoint(){
+  const section=document.getElementById('checkpoint');
+  section.classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  render();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  const b=document.getElementById('cpContinue');
+  if(b) b.addEventListener('click',continueCheckpoint);
+});
+function finish(){
+  document.getElementById('prog').style.width='100%';show('analyzing');
+  const el=document.getElementById('analysisSteps');const steps=['✓ Respostas analisadas','✓ Memória de trabalho','✓ Raciocínio lógico','✓ Percepção visual','✓ Atenção','◌ Preparando seu relatório...'];el.innerHTML=steps.map(x=>`<p>${x}</p>`).join('');
+  setTimeout(()=>{show('email')},2600)
+}
+function submitEmail(){const email=document.getElementById('emailInput').value.trim();if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){alert('Digite um e-mail válido.');return}localStorage.setItem('lead_email',email);localStorage.setItem('marketing_optin',document.getElementById('marketing').checked?'yes':'no');show('offer')}
+const LASTLINK_CHECKOUT='https://lastlink.com/p/CA488936E/checkout-payment/';
+function showPayment(){openCheckout()}
+async function openCheckout(){
+  const email=localStorage.getItem('lead_email')||document.getElementById('emailInput')?.value.trim()||'';
+  if(!email){alert('Digite seu e-mail antes de continuar.');show('email');return}
+  const btn=[...document.querySelectorAll('button')].find(b=>b.textContent.includes('Desbloquear meu resultado'));
+  if(btn){btn.disabled=true;btn.textContent='Preparando seu resultado...'}
+  try{
+    const r=await fetch('/api/create-session',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        email,
+        score,
+        total:qs.length,
+        catScore,
+        catTotal
+      })
+    });
+    const data=await r.json();
+    if(!r.ok) throw new Error(data.error||'Não foi possível salvar seu teste.');
+    localStorage.setItem('quiz_session_id',data.sessionId);
+    localStorage.setItem('quiz_score',String(score));
+    localStorage.setItem('quiz_total',String(qs.length));
+    localStorage.setItem('quiz_catScore',JSON.stringify(catScore));
+    localStorage.setItem('quiz_catTotal',JSON.stringify(catTotal));
+    window.location.href=LASTLINK_CHECKOUT;
+  }catch(e){
+    console.error(e);
+    alert('Não foi possível preparar seu resultado agora. Tente novamente em alguns segundos.');
+    if(btn){btn.disabled=false;btn.textContent='Desbloquear meu resultado — R$ 9,90'}
+  }
+}
+function buildResult(){
+  const pct=k=>Math.round(catScore[k]/catTotal[k]*100);
+  const total=score/qs.length;const final=Math.round(85+total*55);
+  document.getElementById('finalScore').textContent=final;
+  ['Memória','Lógica','Numérico','Atenção','Visual'].forEach((k,i)=>{const p=pct(k);const id=['mem','log','num','att','vis'][i];document.getElementById(id+'Pct').textContent=p+'%';document.getElementById(id+'Bar').style.width=p+'%'});
+}
+</script>
+</body>
+</html>
