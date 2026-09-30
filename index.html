@@ -481,7 +481,10 @@ async function openCheckout(){
     localStorage.setItem('quiz_total',String(qs.length));
     localStorage.setItem('quiz_catScore',JSON.stringify(catScore));
     localStorage.setItem('quiz_catTotal',JSON.stringify(catTotal));
-    window.location.href=LASTLINK_CHECKOUT;
+    
+    const checkoutUrl = new URL(LASTLINK_CHECKOUT);
+checkoutUrl.searchParams.set('utm_content', data.sessionId);
+window.location.href = checkoutUrl.toString();
   }catch(e){
     console.error(e);
     alert('Não foi possível preparar seu resultado agora. Tente novamente em alguns segundos.');
